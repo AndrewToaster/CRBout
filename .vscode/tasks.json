@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build-debug",
+            "command": "D:\\Program Files\\LLVM-MinGW\\bin\\mingw32-make.exe",
+            "type": "process",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "args": [
+                "debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "build-release",
+            "command": "D:\\Program Files\\LLVM-MinGW\\bin\\mingw32-make.exe",
+            "type": "process",
+            "args": [
+                "release"
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "problemMatcher": ["$gcc"]
+        }
+    ]
+}
