@@ -1,23 +1,30 @@
-#ifndef _WIN32
-#error I can't be bothered to make a unix compatible terminal IO right now
+#ifdef _WIN32
+#include <windows.h>
+#include <conio.h>
+#include <io.h>
+#elif __unix__
+#define _POSIX_C_SOURCE 200809L
+#include <errno.h>
+#include <unistd.h>
+#define _isatty(x) isatty(x)
 #endif
 
-#include <io.h>
 #include <fcntl.h>
 #include "rbio.h"
-#include <conio.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <uchar.h>
 #include <locale.h>
-#include <windows.h>
 #include "utils.h"
+#include "tesc.h"
+#include <string.h>
+
 
 static mbstate_t state;
 
 crb_error_t _any_term(FILE *_, bool *result)
 {
-    *result = kbhit();
+    *result = !!crb_tesc_kbhit();
     return crb_error_ok;
 }
 
@@ -40,11 +47,7 @@ crb_error_t _any_file(FILE *file, bool *result)
 
 crb_error_t _readChar_term(FILE *_, int *result)
 {
-    if (!kbhit())
-        *result = -1;
-    
-    *result = getch();
-
+    *result = crb_tesc_kbhit() ? crb_tesc_getch() : -1;
     return crb_error_ok;
 }
 
@@ -74,7 +77,9 @@ static _readChar_func _readChar[2] = {
 
 crb_error_t crb_io_initTerm()
 {
+#ifdef _WIN32
     if (!SetConsoleCP(CP_UTF8) || !SetConsoleOutputCP(CP_UTF8)) CRB_ERR_THROW(CRB_ERR_NEW(CRB_ERR_WIN_ERROR, "Failed to set UTF-8 codepage"));
+#endif
     return crb_error_ok;
 }
 

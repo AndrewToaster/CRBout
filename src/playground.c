@@ -105,7 +105,7 @@ crb_error_t crb_playground_load(crb_playground_t *self, FILE *file)
 crb_error_t crb_playground_set(crb_playground_t *self, size_t x, size_t y, char32_t value)
 {
     if (!self) return crb_error_invalidPtr;
-    CRB_ERR_ASSERT_FALSE(x > self->width - 1 || y > self->height - 1, CRB_ERR_NEW(CRB_ERR_OUT_OF_RANGE, "Index was out of bounds"));
+    CRB_ERR_ASSERT_FALSE(x > self->width - 1 || y > self->height - 1, CRB_ERR_NEWX(CRB_ERR_OUT_OF_RANGE, "Index was out of bounds", "X:%zu\nY:%zu", x, y));
 
     //printf("SET CHARACTER: %u\t-\tX:%llu\tY:%llu\n", value, x, y);
     self->data[y][x] = value;

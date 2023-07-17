@@ -2,6 +2,7 @@
 #define CRBOUT_PLAYGROUND_H
 
 #include <stdio.h>
+#include <stddef.h>
 #include <stdint.h>
 #include "errors.h"
 

@@ -3,8 +3,8 @@
     "tasks": [
         {
             "label": "build-debug",
-            "command": "D:\\Program Files\\LLVM-MinGW\\bin\\mingw32-make.exe",
-            "type": "process",
+            "command": "make",
+            "type": "shell",
             "presentation": {
                 "reveal": "silent"
             },
@@ -19,14 +19,15 @@
         },
         {
             "label": "build-release",
-            "command": "D:\\Program Files\\LLVM-MinGW\\bin\\mingw32-make.exe",
-            "type": "process",
+            "command": "make",
+            "type": "shell",
             "args": [
                 "release"
             ],
             "group": {
                 "kind": "build"
             },
+
             "problemMatcher": ["$gcc"]
         }
     ]

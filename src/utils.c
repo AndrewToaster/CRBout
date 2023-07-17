@@ -7,8 +7,9 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#else
-#error Not yet implemented on windows
+#elif __unix__
+#include <unistd.h>
+#define strnlen(x, y) strlen(x)
 #endif
 
 char* crb_util_formatString(const char *format, ...)
@@ -42,9 +43,11 @@ char* crb_util_joinString(const char* left, const char* right, size_t maxlen)
     return data;
 }
 
+__attribute__((unused))
 void crb_util_sleep(unsigned int ms)
 {
 #if _WIN32
     Sleep(ms);
+#elif __unix__
 #endif
 }

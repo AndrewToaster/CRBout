@@ -12,9 +12,9 @@
 #include <pthread.h>
 #include <stdatomic.h>
 #include <math.h>
-#include <conio.h>
 #include <getopt.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/stat.h>
 
 #define _USEALLBG
@@ -62,7 +62,7 @@ static CRB_ERROR run_loop(FILE *code);
 
 static int handle_error(crb_error_t err)
 {   
-    printf(TESC_SGR_COLOR_BG(100, 10, 10) "[ERROR] code: %lli\n%s\nin %s at %s:%i", err.code, err.message, CRB_ERR_LAST_ERROR_FUNC, CRB_ERR_LAST_ERROR_FILE, CRB_ERR_LAST_ERROR_LINE);
+    printf(TESC_SGR_COLOR_BG(100, 10, 10) "[ERROR] code: %zi\n%s\nin %s at %s:%i", err.code, err.message, CRB_ERR_LAST_ERROR_FUNC, CRB_ERR_LAST_ERROR_FILE, CRB_ERR_LAST_ERROR_LINE);
     if (err.message)
     {
         printf("\n%s", err.data);
@@ -87,14 +87,14 @@ int main(int argc, const char** argv)
     }
     else if (argc < 3)
     {
-        printf("Missing required positional argument at position 2. Allowed values are:\n>[Valid file path]");
+        printf("Missing required positional argument at position 2. Allowed values are:\n>[Valid file path]\n");
         return 1;
     }
 
     struct stat data;
     if (stat(argv[2], &data))
     {
-        printf("File '%s' does not exist", argv[2]);
+        printf("File '%s' does not exist\n", argv[2]);
         return 2;
     }
 
@@ -110,7 +110,7 @@ int main(int argc, const char** argv)
     }
     else
     {
-        printf("Incorrect required positional argument at position 1. Allowed values are:\n>run\n>debug");
+        printf("Incorrect required positional argument at position 1. Allowed values are:\n>run\n>debug\n");
         return 3;
     }
 
@@ -151,6 +151,10 @@ static crb_error_t run_loop(FILE *code)
         CRB_ERR_ASSERT_OK(crb_state_step(&state));
     }
 
+    crb_playground_free(&(state.pg));
+    crb_stack_free(&(state.stack));
+    crb_heap_free(&(state.heap));
+
     return crb_error_ok;
 }
 
@@ -184,7 +188,7 @@ static crb_error_t debug_loop(FILE *code)
         .out = stderr
     };
 
-    printf(TESC_MOVE_HOME);
+    printf(TESC_ALTERNATE_BUFFER_SHOW TESC_MOVE_HOME);
     for (size_t y = 0; y < pg.height; y++)
     {
         for (size_t x = 0; x < pg.width; x++)
@@ -199,7 +203,7 @@ static crb_error_t debug_loop(FILE *code)
     printf(TESC_CURSOR_HIDE);
     char32_t letter, pl;
     size_t px, py;
-    bool flag = false, ignoreNext = false;
+    bool flag = true, ignoreNext = false;
     CRB_ERR_ASSERT_OK(crb_playground_get(&state.pg, state.pos.x, state.pos.y, &letter));
     while (!state.stopped)
     {
@@ -208,9 +212,10 @@ static crb_error_t debug_loop(FILE *code)
             if (ignoreNext)
             {
                 ignoreNext = false;
-                getch();
+                if (crb_tesc_kbhit())
+                    crb_tesc_getch();
             }
-            int c = getch();
+            int c = crb_tesc_getch();
             // Enter
             if (c == 13)
             {
@@ -220,12 +225,12 @@ static crb_error_t debug_loop(FILE *code)
             else if (c == 2)
             {
                 ignoreNext = true;
-                ungetch(getch());
+                CRB_ERR_ASSERT_FALSE(crb_tesc_ungetch(crb_tesc_getch()), CRB_ERR_NEW(CRB_ERR_IO_ERROR, "Ungetch failed"));
             }
         }
-        else if (kbhit())
+        else if (crb_tesc_kbhit())
         {
-            int c = getch();
+            int c = crb_tesc_getch();
             // STX (Ctrl-B)
             if (c == 2)
             {
@@ -234,7 +239,7 @@ static crb_error_t debug_loop(FILE *code)
             }
             else
             {
-                ungetch(c);
+                CRB_ERR_ASSERT_FALSE(crb_tesc_ungetch(c), CRB_ERR_NEW(CRB_ERR_IO_ERROR, "Ungetch failed"));
             }
         }
         px = state.pos.x;
@@ -244,8 +249,8 @@ static crb_error_t debug_loop(FILE *code)
         CRB_ERR_ASSERT_OK(crb_state_step(&state));
         CRB_ERR_ASSERT_OK(crb_playground_get(&state.pg, state.pos.x, state.pos.y, &letter));
         
-        printf(ffTESC_MOVE_YX(%llu) TESC_SGR_COLOR_BG(155, 50, 50) CRB_UTIL_FMT_BINU32 "\n" "[ ",
-            state.pg.height + 1, 0ULL, CRB_UTIL_FMT_BINU32_VAL(state.flags));
+        printf(ffTESC_MOVE_YX(%zu) TESC_SGR_COLOR_BG(155, 50, 50) CRB_UTIL_FMT_BINU32 "\n" "[ ",
+            state.pg.height + 1, (size_t)0, CRB_UTIL_FMT_BINU32_VAL(state.flags));
         
         for (size_t i = 0; i < state.stack.top; i++)
         {
@@ -258,12 +263,18 @@ static crb_error_t debug_loop(FILE *code)
         printf(" ]" TESC_SGR_RESET TESC_ERASE_LINE_RIGHT);
         
 
-        printf(ffTESC_MOVE_YX(%llu), state.pos.y + 1, state.pos.x + 1);
+        printf(ffTESC_MOVE_YX(%zu), state.pos.y + 1, state.pos.x + 1);
         printf(format[!(letter & ~0x7f)][1], char_norm_table[letter]);
 
-        printf(ffTESC_MOVE_YX(%llu), py + 1, px + 1);
+        printf(ffTESC_MOVE_YX(%zu), py + 1, px + 1);
         printf(format[!(pl & ~0x7f)][0], char_norm_table[pl]);
     }
+
+    printf(TESC_ALTERNATE_BUFFER_HIDE);
+
+    crb_playground_free(&(state.pg));
+    crb_stack_free(&(state.stack));
+    crb_heap_free(&(state.heap));
 
     return crb_error_ok;
 }

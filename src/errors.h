@@ -2,7 +2,8 @@
 #define CRBOUT_ERRORS_H
 
 #include <stdbool.h>
-#include <stdint.h>
+#include <stddef.h>
+#include <sys/types.h>
 #include "pputil.h"
 #include "utils.h"
 #include "lib/portablesnips/debugtrap.h"
@@ -18,6 +19,8 @@
 #define CRB_ERR_PARSE_ERROR 8
 #define CRB_ERR_WIN_ERROR 8
 #define CRB_ERR_IO_ERROR 9
+
+#define CRB_ERR_BREAK_ON_ERROR
 
 #ifdef CRB_ERR_BREAK_ON_ERROR
 #define CRB_ERR__TRAP() psnip_trap()

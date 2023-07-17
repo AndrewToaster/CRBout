@@ -84,6 +84,7 @@ crb_error_t crb_parser_eatNewline(crb_parser_state_t *state)
     if (c1 == '\r' &&  c2 == '\n')
     {
         state->offset++;
+        state->prev = CRB_PARSER_NO_CHAR;
     }
     return crb_error_ok;
 }

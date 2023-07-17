@@ -1,4 +1,5 @@
-/*#include "io.h"
+/*
+#include "io.h"
 #include <pthread.h>
 
 #include <stdint.h>
@@ -57,4 +58,5 @@ crb_error_t crb_read_char(char *result)
     pthread_mutex_unlock(&io_data_mutex);
 
     return crb_error_ok;
-}*/
+}
+*/

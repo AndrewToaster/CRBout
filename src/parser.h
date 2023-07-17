@@ -2,6 +2,7 @@
 #define CRBOUT_PARSER_H
 
 #include <stdio.h>
+#include <stddef.h>
 #include "errors.h"
 #include "playground.h"
 

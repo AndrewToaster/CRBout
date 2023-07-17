@@ -1,6 +1,7 @@
 #ifndef CRBOUT_RBSTATE_H
 #define CRBOUT_RBSTATE_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include "stack.h"

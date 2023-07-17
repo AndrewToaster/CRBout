@@ -3,7 +3,7 @@
 
 #include "errors.h"
 #include "valuetypes.h"
-#include "stdio.h"
+#include <stdio.h>
 
 CRB_ERROR crb_io_initTerm();
 CRB_ERROR crb_io_readChar(FILE *file, int *result);

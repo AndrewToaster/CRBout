@@ -1,6 +1,7 @@
 #ifndef CRBOUT_STACK_H
 #define CRBOUT_STACK_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include "valuetypes.h"
 #include "errors.h"

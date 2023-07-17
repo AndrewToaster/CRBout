@@ -1,7 +1,7 @@
 #ifndef CRBOUT_UTILS_H
 #define CRBOUT_UTILS_H
 
-#include <stdint.h>
+#include <stddef.h>
 
 #define CRB_UTIL_WITH(resource, code, res_free) \
     {\

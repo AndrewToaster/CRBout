@@ -58,6 +58,9 @@
 #define TESC_ERASE_LINE_LEFT TESC_CSI "1K"
 #define TESC_ERASE_LINE_ALL TESC_CSI "2K"
 
+#define TESC_ALTERNATE_BUFFER_SHOW TESC_CSI "?1049h"
+#define TESC_ALTERNATE_BUFFER_HIDE TESC_CSI "?1049l"
+
 //!! THESE ARE PLATFORM SPECIFIC, WILL NOT WORK ON POSIX
 //TODO: Implement a platform agnostic approach
 #define GETCH_UPARROW  72
@@ -65,8 +68,12 @@
 #define GETCH_LEFTARROW 75
 #define GETCH_RIGHTARROW 77
 
-void crb_tesc_getchStart(void);
-char crb_tesc_getch(void);
-void crb_tesc_getchStop(void);
+void crb_tesc_unbuffer(void);
+int crb_tesc_getch(void);
+void crb_tesc_restore(void);
+int crb_tesc_ungetch(int);
+bool crb_tesc_kbhit(void);
+bool crb_tesc_showAlternateBuffer();
+bool crb_tesc_hideAlternateBuffer();
 
 #endif
